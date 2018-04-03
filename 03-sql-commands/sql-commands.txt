@@ -1,0 +1,136 @@
+1. List the commands for adding, updating, and deleting data
+a. Adding - INSERT INTO
+b. Updating - UPDATE
+c. Deleting - DELETE FROM
+
+2. Explain the structure for each type of command.
+a. Adding
+   INSERT INTO table (col_1, col_2) VALUES (val_1,val_2);
+
+b. Updating
+   UPDATE table SET col=val;                //sets all values in the given columns
+   UPDATE table SET col=val WHERE clause;   //sets values matching where clause
+
+c. Deleting
+   DELETE FROM table WHERE clause;
+
+3. What are some the data types that can be used in tables? Give a real world example of each.
+a. Text - post, comment
+b. Date - date of sign up
+c. timestamp - when record was created or updated
+d. money - price, can use monetary symbol
+e. integer - id number
+f. varchar - username, email (variable-length with a limit)
+
+4. Think through how to create a new table to hold a list of people invited to a wedding. This table needs to have first and last name, whether they sent in their RSVP, the number of guests they are bringing, and the number of meals (1 for adults and 1/2 for children).
+
+Which data type would you use to store each of the following pieces of information?
+
+a. First and last name - text
+b. Whether they sent in their RSVP - boolean
+c. Number of guests - smallint or integer
+d. Number of meals - decimal
+
+Write a command that makes the table to track the wedding.
+CREATE TABLE wedding
+(
+first_name  text,
+last_name   text,
+rsvp        boolean,
+num_guests  integer,
+num_meals   decimal
+);
+
+Using the table we just created, write a command that adds a column to track whether they were sent a thank you card.
+ALTER TABLE wedding ADD COLUMN thank_you boolean;
+
+You have decided to move the data about the meals to another table, so write a command to remove the column storing the number meals from the wedding table.
+ALTER TABLE wedding DROP COLUMN num_meals;
+
+The guests are going to need a place to sit at the reception, so write a command that adds a column for table number.
+ALTER TABLE wedding ADD COLUMN table integer;
+
+The wedding is over and we do not need to keep this information, so write a command that deletes the wedding table from the database.
+DROP TABLE wedding;
+
+5. Write a command to make a new table to hold the books in a library with the columns ISBN, title, author, genre, publishing date, number of copies, and available copies.
+CREATE TABLE library
+(
+isbn          integer,
+title         text,
+author        text,
+genre         text,
+publish_date  date,
+num_copies    integer,
+available_copies  integer
+);
+
+Find three books and add their information to the table.
+INSERT INTO table (isbn, title, author, genre, publish_date, num_copies, available_copies)
+VALUES
+(9781783295401, 'A Darker Shade of Magic', 'V.E. Schwab', 'Fantasy', 2015-02-24, 3, 2),
+(9780062676368, 'Restore Me', 'Tahereh Mafi', 'science Fiction & Dystopian', 2018-04-06, 5, 0),
+(9780316341684, 'Strange the Dreamer', 'Laini Taylor', 'Fantasy', 2017-04-28, 2, 2);
+
+Someone has just checked out one of the books. Change the available copies column to 1 fewer.
+UPDATE library SET available_copies=1 WHERE isbn=9780316341684;
+
+Now one of the books has been added to the banned books list. Remove it from the table.
+I fundamentally cannot support banned books, but I will give you age appropriateness:
+DELETE FROM library WHERE isbn=9780062676368;
+
+6. Write a command to make a new table to hold spacecrafts. Information should include id, name, year launched, country of origin, a brief description of the mission, orbiting body, if it is currently operating, and approximate miles from Earth. In addition to the table creation, provide commands that perform the following operations:
+CREATE TABLE spacecrafts
+(
+id                    integer,
+name                  text,
+year_launched         date,
+origin                text,
+mission_description   date,
+orbiting_body         text,
+operational           boolean,
+miles_from_earth      integer
+);
+
+Add 3 non-Earth-orbiting satellites to the table.
+INSERT INTO table (id, name, year_launched, origin, mission_description, operational, miles_from_earth)
+VALUES
+(1, 'Juno', 2011, 'USA', 'Juno's mission is to measure Jupiter's composition, gravity field, magnetic field, and polar magnetoshpere.', 'Jupiter', true, 365,000,000),
+(2, 'Cassini-Huygens', 1997, 'USA', 'The Cassini-Huygens mission was a collaboration between NASA, the European Space Agency (ESA), and the Italian Space Agency (ASI) to send a probe to study the planet Saturn and its system, including its rings and natural satellites.', false, 756,000,000),
+(3, 'Mars Reconnaissance Orbiter', 2005, 'USA', 'The Mars Reconnaissance Orbiter is the second NASA satellite orbiting Mars. It is specifically designed to analyze the landforms, stratigraphy, minerals, and ice of the red planet.', true, 140,000,000);
+
+Remove one of the satellites from the table since it has just been crashed into the planet.
+Oh no! (well Cassini already did so ...)
+DELETE FROM spacecrafts WHERE id=2;
+
+Edit another satellite because it is no longer operating and change the value to reflect that.
+Shi*t NASA, get on your game!
+UPDATE spacecrafts SET operational=false WHERE id=1;
+
+7.Write a command to make a new table to hold the emails in your inbox. This table should include an id, the subject line, the sender, any additional recipients, the body of the email, the timestamp, whether or not it’s been read, and the id of the email chain it’s in. Also provide commands that perform the following operations:
+CREATE TABLE emails
+(
+id                    integer,
+subject               text,
+sender                text,
+add_recipients        text,
+body                  text,
+timestamp             timestamp,
+read                  boolean,
+email_chain           integer
+);
+
+Add 3 new emails to the inbox.
+INSERT INTO emails (id, subject, sender, add_recipients, body, timestamp, read, email_chain)
+VALUES
+(1, 'Staging Details', 'connie@mydesign.com','none', 'We are confirmed for Vignette Staging this Thursday, April 5th (Vignette Staging is basically a partial, or "light" staging). Arrival time is tentatively set for between 11 am-12 pm, but is a bit fluid due to scheduling for furniture delivery. I recommend  keeping between about 11-1 open.', 2018-04-02 18:35:06, true, 5423),
+(2, 'Party Invite', 'carlam@gmail.com', 'mwyll@gmail.com', 'Hi friends! For my 40th birthday I decided that I wanted to get dressed up and go out. Then I realized that I didn't want to go any of the places that you get dressed up for in Austin (all two of them), so instead I'll be getting fancy and having pizza! Put on your Sunday Best  (is that just a black thing? If so, put on your nice stuff, your church clothes, a ball gown, a little black dress, cocktail attire, that bridesmaid dress she said you'd be able to wear again) and come enjoy some delicious carbs! *Full disclosure: I'm planning on a cocktail or prom dress. Not sure which way the wind will blow.', 2018-04-01 16:03:36, true, 5424),
+(3, 'Seller's Disclosure', 'alexg@bramlett.com', 'mwyll@gmail.com', 'On page 1, we'll actually need to note either 'Y', 'N', or 'U' for every item in section 1. Are you able to redo that first section? Let me know if you'd like to jump on a call and I can refill it out on my end and attach the first page to the other two. Page 2 and 3 are both perfect as is. Thanks!', 2018-01-03 11:24:45, true, 5425);
+
+You’ve just deleted one of the emails, so write a command to remove the row from the inbox table.
+DELETE FROM emails WHERE id=1;
+
+You started reading an email but just heard a crash in another room. Mark the email as unread before investigating, so you can come back to it later.
+It was probably the Juno satellite...
+
+UPDATE emails SET read=false WHERE id=3;
