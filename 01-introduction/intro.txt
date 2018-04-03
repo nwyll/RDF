@@ -1,0 +1,59 @@
+1. What data types do each of these values represent?
+
+a. "A Clockwork Orange" - string
+b. 42 - Integer
+c. 09/02/1945 - Date
+d. 98.7 - Float
+e. $15.99 - String if you want the $
+
+2. Explain in your own words when a database might be used. Explain when a text file might be used.
+   A database will be used when you have information that needs to persist outside of when your application is running. Generally you want to use a database if you have large amount of data to store and if that data needs to be accessed, edited, or added to by multiple users/applications. An example of when a text file might be used: My father owned a small automotive business and for tax purposes he had to do a full inventory once a year. He was the only person accessing the inventory list. There were not multiple locations or users accessing this data. So he kept this data in an excel file. It was a simple list of part name, price, and number of units. This information could have been stored in excel or a simple text file. (Of course this process could have been streamlined if he had used an inventory management system, but you try to get my father to change after 40 years - I kid you not, he use to do it on paper!!! AGH! I also may or may not have been forced to help with inventory as a child.)
+
+3. Describe one difference between SQL and other programming languages.
+   SQL is a declarative language versus a procedural language. Which means we don't really care how the information is stored or located; we are just concerned with what we want to find or store.
+
+4. In your own words, explain how the pieces of a database system fit together at a high level.
+
+5. Explain the meaning of table, row, column, and value.
+   Table - a collection of data about a certain topic, like users.
+   Column - define the categories the data represents
+   Row - make up one entire unit
+   Cell/Value - the intersection of a row and column, some piece of information the column name describes
+
+6. List 3 data types that can be used in a table.
+   Strings (text)
+   Integers
+   Dates
+
+7. Given this payments table, provide an English description of the following queries and include their results:
+
+a. SELECT date, amount
+   FROM payments;
+   "What are the dates and amounts in the payments table?"
+
+b. SELECT amount
+   FROM payments
+   WHERE amount > 500;
+   "What are the amounts greater than 500 in the payments table?"
+
+c. SELECT *
+   FROM payments
+   WHERE payee = 'Mega Foods';
+   "Find all the data in the payments table related to the payee that matches Mega Foods."
+
+8. Given this users table, write SQL queries using the following criteria and include the output:
+
+a. The email and sign-up date for the user named DeAndre Data.
+   SELECT email, signup
+   FROM payments
+   WHERE name = 'DeAndre Data';
+
+b. The user ID for the user with email 'aleesia.algorithm@uw.edu'.
+   SELECT id
+   FROM payments
+   WHERE email = 'aleesia.algorithm@uw.edu';
+
+c. All the columns for the user ID equal to 4.
+   SELECT *
+   FROM payments
+   WHERE id = 4;
