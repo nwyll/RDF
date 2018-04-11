@@ -1,0 +1,164 @@
+1. List 5 aggregate functions and explain, in your own words, what they are for. Include a real world example for each. If you can’t list these from memory, do these flashcards until you can!
+
+Consider a library database.
+SUM -  Gives the total for a column. Sum could be used to get the total amount of fees due for damaged or lost books.
+
+AVG -  Gives the average for a column. Average could be used to find the average number pages for the books in the colletion. Or the average cost due for a damaged/lost book.
+
+MAX - Returns the maximum amount in a given column. Maximum could be used to find the longest book in the collection.
+
+MIN - Returns the minimum amount in a given column. Minimum could be used to find the shortest wait time for a specific book (with multiple copies) that is unavailable.
+
+COUNT - Returns the number of entries in a column. Count could be used to find the total number of books in the collection.
+
+2. Given this donations table, write queries and include the output for the following:
+
+a. The total of all donations received in the past year.
+SELECT SUM(amount)
+FROM donations;
+
+SUM = 993
+
+b. The total donations over time per donor (e.g. if Tanysha has donated 3 times with the amounts $25, $30, and $50, then the result would be | Tanysha | 105 |).
+SELECT donor, SUM(amount)
+FROM donations
+GROUP BY donor
+ORDER BY donor;
+
+donor   	  sum
+Arya	      60
+Bran	      25
+Brienne 	  75
+Bronn	      20
+Daario	    10
+Daenerys    173
+Gilly   	  7
+Jon	        25
+Margaery	  120
+Melisandre	45
+Missandei	  90
+Petyr	      70
+Samwell	    20
+Sansa	      33
+Theon	      20
+Tormund	    50
+Tyrion	    120
+Ygritte	    30
+
+c. The average donation per donor.
+SELECT AVG(amount)
+FROM donations;
+
+AVG = 36.78
+
+d. The number of donations over $100.
+SELECT COUNT(amount)
+FROM donations
+WHERE amount > 100;
+
+Count = 2
+
+e. The largest donation received in a single instance from a single donor.
+SELECT MAX(amount)
+FROM donations;
+
+MAX = 120
+
+f. The smallest donation received.
+SELECT MIN(amount)
+FROM donations;
+
+MIN = 5
+
+3. How would you determine the display order of data returned by your SELECT statement?
+Use the ORDER BY clause and list the column name that you want to use to order your results. The default is in ascending order. So you would have to use ORDER BY col_name DESC to use descending order.
+
+4. What is a real world situation where you would use OFFSET?
+Say you are a business owner and you want to get a list of all but your 5 most expensive items in your inventory.
+
+SELECT product_name, price
+FROM products
+ORDER BY price
+OFFSET 5;
+
+5. Why is it important to use ORDER BY when limiting your results?
+You don't have to use ORDER BY with a limit clause, it is optional. But if you do not you will just get the number of records specified as they are stored in the table. For example SELECT name FROM some_table LIMIT 1 will give you the first name that is stored in your table. But if you add  SELECT name FROM some_table ORDER BY name LIMIT 1, this will give you the first name in alphabetical order. Having your data ordered in some manor, either ASC or DESC, can often be helpful to get at the data you need more readily.
+
+6. What is the difference between HAVING and WHERE?
+HAVING and WHERE perform similar functions. They both limit the data retrieved by some condition. WHERE statements limit filter the rows in the table based on some condition. Where as, a HAVING statement limits groups after some aggregation has been performed and has to be used with a GROUP BY statement. A HAVING statement filters groups.
+
+7. Correct the following SELECT statement:
+
+ SELECT id, SUM(amount)
+ FROM payment
+ GROUP BY id
+ HAVING SUM(amount) > 200;
+
+8.Follow the instructions for the scenarios below:
+
+a. Given this [cats][http://sqlfiddle.com/#!17/bc4d2] table from the previous checkpoint, list all cats organized by intake date.
+SELECT *
+FROM cats
+ORDER BY intake_date;
+
+id	  name	    gender	   age	    intake_date	    adoption_date
+1	    Mushi	      M	        1	      2016-01-09	    2016-03-22
+2	    Seashell	  F	        7	      2016-01-09	    (null)
+3	    Azul	      M	        3	      2016-01-11	    2016-04-17
+4	    Victoire	  M	        7	      2016-01-11	    2016-09-01
+5	    Nala	      F	        1	      2016-01-12	    (null)
+
+b. Given this adoptions table, determine the 5 most recent adoptions to be featured for a social media promotion called "Happy Tails" which lists recent successful adoptions.
+SELECT *
+FROM adoptions
+ORDER by date DESC
+LIMIT 5;
+
+id	      adopter	           cat	          date	       fee
+10093	    Hermione Granger	 Crookshanks	  1993-08-31	 10
+10054	    Arabella Figg   	 Mr. Tibbles	  1990-02-18	 30
+10055	    Arabella Figg	     Mr. Paws	      1990-02-18	 30
+10040	    Arabella Figg	     Snowy	        1989-11-29	 35
+10037	    Arabella Figg	     Tufty	        1988-05-03	 20
+
+c. There is a potential adopter looking for an adult female cat. In the most efficient way possible, list all female cats 2 or more years old from the cats table.
+SELECT *
+FROM cats
+WHERE gender = 'F' AND age >= 2 AND adoption_date IS NULL;
+
+id	  name 	     gender	  age	   intake_date	  adoption_date
+2	    Seashell	 F	      7	     2016-01-09	    (null)
+
+d. From the donations table (from problem #2), find the top 5 donors with the highest cumulative donation amounts to be honored as “Platinum Donors”.
+SELECT donor AS Platinum_Donors, SUM(amount)
+FROM donations
+GROUP BY donor
+ORDER BY SUM(amount) DESC
+LIMIT 5;
+
+platinum_donors	  sum
+Daenerys	        173
+Margaery	        120
+Tyrion	          120
+Missandei	        90
+Brienne	          75
+
+e. From the donations table (from problem #2), find donors 6-15 with the next highest cumulative donation amounts to be honored as “Gold Donors”.
+SELECT donor AS Gold_Donors, SUM(amount)
+FROM donations
+GROUP BY donor
+ORDER BY SUM(amount) DESC
+LIMIT 10
+OFFSET 5;
+
+gold_donors	  sum
+Petyr	        70
+Arya	        60
+Tormund	      50
+Melisandre	  45
+Sansa	        33
+Ygritte	      30
+Jon	          25
+Bran	        25
+Samwell	      20
+Theon	        20
