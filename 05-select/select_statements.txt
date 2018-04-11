@@ -37,12 +37,16 @@ WHERE  breed LIKE '%great dane%' OR weight > 60;
 
 4. Given this cats table, what records are returned from these queries?
 a. SELECT name, adoption_date FROM cats;
+The name and adoption_date of all cats.
+
 b. SELECT name, age FROM cats;
+The name and age of all cats.
 
 5. From the cats table, write queries to select the following pieces of data.
 a. Display all the information about all of the available cats.
 SELECT *
-FROM cats;
+FROM cats
+WHERE adoption_date IS NULL;
 
 b. Display the name and sex of all cats who are 7 years old.
 SELECT name, gender
@@ -50,7 +54,7 @@ FROM   cats
 WHERE  age > 7;
 
 c. Find all of the names of the cats, so you don’t choose duplicate names for new cats.
-SELECT name
+SELECT DISTINCT name
 FROM   cats;
 
 6. List each comparison operator and explain, in your own words, when you would use it. Include a real world example for each. If you can’t list these from memory, do these flashcards until you can!
