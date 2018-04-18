@@ -1,0 +1,231 @@
+1. How do you find related data that is held in two separate data tables?
+Use JOIN statements to combine information from two or more related tables.
+
+2. Explain, in your own words, the difference between a CROSS JOIN, INNER JOIN, LEFT OUTER JOIN, RIGHT OUTER JOIN, and FULL OUTER JOIN. Give a real world example for each.
+
+CROSS JOIN - Will give you all of the possible combinations between two (or more) tables. An example would be to use a cross join to find all of the possible colors and sizes available for a product.
+
+INNER JOIN - Combines rows from two or more tables based on a related column. It selects records that have matching values in both tables.
+
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+This inner join will list all of the customer names (Customers - left table) with each orderId associated with that customer (Orders- right table). ONly the customers with associated orders will be listed.
+
+LEFT OUTER JOIN - Returns all records from the left table and the matching records from the right table.
+
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+LEFT JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+This left outer join will list all of the customer names (Customers - left table) with each orderId associated with that customer (Orders- right table). All customers will be listed even if they do not have an order. The orderId will be null in this case.
+
+RIGHT OUTER JOIN - Returns all records from the right table and the matching records from the left table.
+
+SELECT Orders.OrderID, Employees.Name
+FROM Orders
+RIGHT JOIN Employees
+ON Orders.EmployeeID = Employees.EmployeeID
+ORDER BY Orders.OrderID;
+
+This right outer join will return all of the employees names and the orders they are reponsible for. Employees is the right table and Orders is the left table. IN this case all employee names will be listed even if they are not responsible for an order.
+
+FULL OUTER JOIN - Returns all records from the left table and the right table, whether they match or not.
+
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+FULL OUTER JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+This full outer join will list out all customers and orders from both tables, Customers will out and order will just list their customer name, matching records will be matched - i.e. customer name with their associated orderId, and orders without an associated customer will be listed as well.
+
+3. Define primary key and foreign key. Give a real world example for each.
+A primary key is a unique identifier for a given row in a table. It is only used once in the table. A primary key can be used as a foreign key in another table to associate data between tables. For example to connect a post with its comments each post will have a primary key associated with it and the post table may also contain comment ids as foreign keys in the post table.
+
+4. Define aliasing.
+Aliasing is a way to create shorthand variable names for column or table names.
+
+5. Change this query so that you are using aliasing:
+SELECT p.name, c.salary, c.vacation_days
+FROM professor AS p
+JOIN compensation AS c ON p.id = c.professor_id;
+
+6. Why would you use a NATURAL JOIN? Give a real world example.
+You might want to use natural join if you want to join two tables that have the columns of the same name that you only want to appear once in the results. For example, say we have a bank database with a table for loans and borrowers. In the loans table we have the loan_id as a primary key, along with the originating_branch and loan_amount. In the borrowers table we have the loan_id (here as a foreign key), along with the customer_id and customer_name. Since loan_id is named the same in both tables we could use a natural join to list out customer and loan information without the loan_id being duplicated.
+
+7. Using this Employee schema and data, write queries to find the following information:
+All employees with their shifts if they have any. Also include any unscheduled shifts.
+
+SELECT employees.name, shifts.date, shifts.start_time, shifts.end_time
+FROM employees
+FULL OUTER JOIN scheduled_shifts ON employees.id = scheduled_shifts.employee_id
+FULL OUTER JOIN shifts ON shifts.id = scheduled_shifts.shift_id;
+
+8. Using this Adoption schema and data, please write queries to retrieve the following information and include the results:
+a. All volunteers. If the volunteer is fostering a dog, include each dog as well.
+I was not sure what information was wanted for the volunteer and dog, so I included all the information for both.
+
+SELECT *
+FROM volunteers
+LEFT JOIN dogs ON volunteers.foster_dog_id = dogs.id
+ORDER BY volunteers.id;
+
+id	first_name	last_name	address	phone_number	available_to_foster	foster_dog_id	id	name	gender	age	weight	breed	intake_date	in_foster
+1	Albus	Dumbledore	99 Godric's Hollow	843-746-3649	false	(null)	(null)	(null)	(null)	(null)	(null)	(null)	(null)	(null)
+2	Rubeus	Hagrid	1 Edge of Forbidden Forest	256-667-2378	true	10002	10002	Munchkin	F	0	8	dachsund chihuahua	2017-01-13	(null)
+3	Remus	Lupin	12 Grimmauld Place	627-283-3771	true	(null)	(null)	(null)	(null)	(null)	(null)	(null)	(null)	(null)
+4	Sirius	Black	12 Grimmauld Place	878-666-4663	true	(null)	(null)	(null)	(null)	(null)	(null)	(null)	(null)	(null)
+5	Marjorie	Dursley	1990 Next Door to Fubster	463-528-2253	true	10006	10006	Marmaduke	M	7	150	great dane	2016-03-22	(null)
+
+b. The cat's name, adopter's name, and adopted date for each cat adopted within the past month to be displayed as part of the "Happy Tail" social media promotion which posts recent successful adoptions.
+
+SELECT cats.name AS "Cat's Name", CONCAT(adopters.first_name , ' ' , adopters.last_name) AS "Adopter's Name", cat_adoptions.date AS "Adoption Date"
+FROM cats
+JOIN cat_adoptions ON cats.id = cat_adoptions.cat_id
+JOIN adopters ON adopters.id = cat_adoptions.adopter_id
+WHERE cat_adoptions.date > CURRENT_DATE - INTERVAL '30 DAYS';
+
+Cat's Name	   Adopter's Name	   Adoption Date
+Mushi	         Arabella Figg	   2018-03-23
+Victoire	     Argus Filch	     2018-03-28
+
+c. Adopters who have not yet chosen a dog to adopt and generate all possible combinations of adopters and available dogs.
+
+SELECT CONCAT(adopters.first_name , ' ' , adopters.last_name) AS "Available Adopter", dogs.name AS "Available Dog"
+FROM adopters CROSS JOIN dogs
+LEFT JOIN dog_adoptions ON adopters.id = dog_adoptions.adopter_id
+WHERE dog_adoptions.adopter_id IS NULL;
+
+Available Adopter	  Available Dog
+Hermione Granger	  Boujee
+Arabella Figg	      Boujee
+Hermione Granger	  Munchkin
+Arabella Figg	      Munchkin
+Hermione Granger	  Marley
+Arabella Figg	      Marley
+Hermione Granger	  Lassie
+Arabella Figg	      Lassie
+Hermione Granger	  Marmaduke
+Arabella Figg	      Marmaduke
+Hermione Granger  	Rosco
+Arabella Figg	      Rosco
+
+d. Lists of all cats and all dogs who have not been adopted.
+
+SELECT dogs.name AS "Available Dogs"
+FROM dogs
+LEFT JOIN dog_adoptions ON dogs.id = dog_adoptions.dog_id
+WHERE dog_adoptions.date IS NULL
+ORDER BY dogs.name;
+
+Available Dogs
+Boujee
+Lassie
+Marley
+Marmaduke
+Munchkin
+
+SELECT cats.name AS "Available Cats"
+FROM cats
+LEFT JOIN cat_adoptions ON cats.id = cat_adoptions.cat_id
+WHERE cat_adoptions.date IS NULL
+ORDER BY cats.name;
+
+Available Cats
+Nala
+Seashell
+
+e. Volunteers who are available to foster. If they currently are fostering a dog, include the dog. Also include all dogs who are not currently in foster homes. *** The provided schema is not complete, must add data for in_foster in dogs table to work correctly ***
+
+SELECT volunteers.first_name, volunteers.last_name, dogs.name AS "Dog"
+FROM volunteers
+FULL OUTER JOIN dogs ON volunteers.foster_dog_id = dogs.id
+WHERE volunteers.available_to_foster IS TRUE OR dogs.in_foster IS FALSE;
+
+first_name	 last_name	   Dog
+null	       null	         Boujee
+Rubeus	     Hagrid	       Munchkin
+null	       null	         Marley
+null	       null	         Lassie
+Marjorie	   Dursley	     Marmaduke
+null	       null	         Rosco
+Sirius	     Black	       null
+Remus	       Lupin	         null
+
+f. The name of the person who adopted Rosco.
+SELECT CONCAT(adopters.first_name , ' ' , adopters.last_name) AS "Adopter"
+FROM adopters
+JOIN dog_adoptions ON adopters.id = dog_adoptions.adopter_id;
+
+Adopter
+Argus Filch
+
+9. Using this Library schema and data, write queries applying the following scenarios:
+a. To determine if the library should buy more copies of a given book, please provide the names and position, in order, of all of the patrons with a hold (request for a book with all copies checked out) on "Advanced Potion-Making".
+
+SELECT patrons.name, holds.rank, books.title
+FROM holds
+JOIN patrons ON holds.patron_id = patrons.id
+JOIN books ON holds.isbn = books.isbn
+WHERE books.title='Advanced Potion-Making'
+ORDER BY holds.rank;
+
+name        	   rank	    title
+Terry Boot	     1	      Advanced Potion-Making
+Cedric Diggory	 2	      Advanced Potion-Making
+
+b. Make a list of all book titles and denote whether or not a copy of that book is checked out.
+
+SELECT books.title, transactions.checked_out_date
+FROM books
+JOIN transactions ON books.isbn = transactions.isbn
+WHERE transactions.checked_in_date IS NULL;
+
+title	                                    checked_out_date
+Fantastic Beasts and Where to Find Them	  2018-04-17T00:00:00.000Z
+Advanced Potion-Making	                  2018-04-15T00:00:00.000Z
+
+c. In an effort to learn which books take longer to read, the librarians would like you to create a list of total checked out time by book name in the past month.
+
+SELECT books.title, transactions.checked_in_date - transactions.checked_out_date AS "Read Time in Days"
+FROM books
+JOIN transactions ON books.isbn = transactions.isbn
+WHERE transactions.checked_out_date > CURRENT_DATE - INTERVAL '31 DAYS' AND transactions.checked_in_date IS NOT NULL;
+
+title	                                      Read Time in Days
+Fantastic Beasts and Where to Find Them	    3
+Fantastic Beasts and Where to Find Them	    2
+
+d. In order to learn which items should be retired, make a list of all books that have not been checked out in the past 5 years.
+
+SELECT books.title, transactions.checked_out_date AS "Last Check Out Date > 5 years"
+FROM books
+JOIN transactions ON books.isbn = transactions.isbn
+WHERE transactions.checked_out_date < CURRENT_DATE - INTERVAL '5 YEARS';
+
+title	                                      Last Check Out Date > 5 years
+Hogwarts: A History	                        2012-04-17T00:00:00.000Z
+Advanced Potion-Making	                    2012-04-17T00:00:00.000Z
+Fantastic Beasts and Where to Find Them	    2012-04-17T00:00:00.000Z
+
+e. List all of the library patrons. If they have one or more books checked out, correspond the books to the patrons.
+
+SELECT patrons.name, books.title, transactions.checked_in_date
+FROM patrons
+FUll OUTER JOIN transactions ON transactions.patron_id = patrons.id
+JOIN books ON transactions.isbn = books.isbn
+ORDER BY patrons.name;
+
+name	               title	                                    checked_in_date
+Cedric Diggory	     Fantastic Beasts and Where to Find Them	  null
+Cho Chang	           Advanced Potion-Making	                    2012-04-18T00:00:00.000Z
+Hermione Granger     Fantastic Beasts and Where to Find Them	  2018-04-17T00:00:00.000Z
+Hermione Granger	   Hogwarts: A History	                      2012-04-18T00:00:00.000Z
+Padma Patil	         Fantastic Beasts and Where to Find Them	  2018-04-14T00:00:00.000Z
+Terry Boot	         Advanced Potion-Making	                    null
+Terry Boot	         Fantastic Beasts and Where to Find Them	  2012-04-18T00:00:00.000Z
