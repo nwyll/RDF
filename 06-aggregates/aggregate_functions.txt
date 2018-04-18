@@ -46,10 +46,30 @@ Tyrion	    120
 Ygritte	    30
 
 c. The average donation per donor.
-SELECT AVG(amount)
-FROM donations;
+SELECT donor, AVG(amount)
+FROM donations
+GROUP BY donor
+ORDER BY donor;
 
-AVG = 36.78
+donor	       avg
+Arya	       20.00
+Bran	       25.00
+Brienne	     75.00
+Bronn	       20.00
+Daario	     10.00
+Daenerys	   86.50
+Gilly	       7.00
+Jon	         25.00
+Margaery	   120.00
+Melisandre	 45.00
+Missandei	   22.50
+Petyr	       70.00
+Samwell	     20.00
+Sansa	       33.00
+Theon	       10.00
+Tormund	     50.00
+Tyrion	     40.00
+Ygritte	     30.00
 
 d. The number of donations over $100.
 SELECT COUNT(amount)
