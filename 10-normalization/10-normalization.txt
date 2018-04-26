@@ -1,0 +1,156 @@
+1. In your own words, explain the benefits of normalization. Include a real-world scenario where normalization is necessary.
+
+The benefit and goal of database normalization is to reduce or eliminate data redundancy. The process of normalization helps to maintain data's integrity in the database and limit data inconsistencies. The process optimizes JOINS and provides faster update performance.
+
+An example of where you would need a normalized database could be a website that sell items to customers. Data would need to be collected about the customer's order, payment information and shipping information. All of this information needs to be initially stored, will need to be retrieved at some point and could potentially be updated in the future - new shipping or billing address, new credit card info, or more orders in the future. A non-normalized database could lead to a whole host of issues. What if shipping addresses are store in two places and both aren't updated properly - now your products are being shipped to the wrong customer. Not good. What if their there are inconsistencies in payment information - now your not getting paid. Not good. What of you can't properly insert new clients - now you cant grow your business and fulfill the new orders. Also, not good.
+
+2. List and explain the different normal forms and how they relate to one another, with regard to your real-world scenario in the first question.
+
+1NF - First Normal Form - The first normal for requires eliminating repeating groups in individual tables, creating a separate table for each set of related data and identifying each set of related data with a primary key. In the example above, if a customer has made multiple orders we would not want to store that information in a single row related to the customer. Each order should have its own row.
+
+2NF - Second Normal Form - The second normal for requires that the data first comply with the First Normal Form. Additionally, non-key attributes in a table can only be dependent on the primary key. The easiest way to do this is to think about the purpose of the table. For example, if we are talking about orders in the previous scenario lets think of some possible columns - order id (PK), customer id (FK), the items in the order, shipping address. Does each column describe the primary key or the order in this case? I would argue that the shipping address is an attribute of the customer. The order is described by its id, who its for (customer id), and what items it contains. So to adhere to the 2NF you would remove shipping address from the order table.
+
+3NF - Third Normal Form - The third normal form requires that the second normal form is satisfied (and therefore the first as well), additionally, all attributes in a table must represent a fact about the key and nothing but the key. Third normal form removes transient dependencies from the table. In the order scenario above, if our order table included order_id, item_id and item_description. Item description is dependent on the item id which is dependent on the order id. This creates an transient dependency. To comply with 3NF you would want to remove item description from the order table and add a table for items that has id as the primary key and description as an attribute.
+
+BCNF - Boyce Codd Normal Form - the Boyce Codd normal form, or 3.5NF, is a stricter version of the third normal form. Boyce Codd normal form must be 3NF, and thus 1NF and 2NF by default. But the BCNF go a step further saying that for every dependency the key must be a super key. The super key is a set of attributes that can be used to uniquely identity all other attributes.
+
+3. This student_records table contains students and their grades in different subjects. The schema is already in first normal form (1NF). Convert this schema to the third normal form (3NF) using the techniques you learned in this checkpoint.
+
+CREATE TABLE student_records (
+  "student_id"     INTEGER,
+  "student_email"  VARCHAR(24),
+  "student_name"   VARCHAR(9),
+
+  PRIMARY KEY ("student_id")
+);
+
+CREATE TABLE professors (
+  "id"       INTEGER,
+  "professor_name" VARCHAR(32),
+
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE subjects (
+  "id"            INTEGER,
+  "subject_name"  VARCHAR(32),
+
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE grades (
+  "id"             INTEGER,
+  "student_id"     INTEGER,
+  "professor_id"   INTEGER,
+  "subject_id"     INTEGER,
+  "grade"          VARCHAR(1),
+
+  FOREIGN KEY ("student_id")
+    REFERENCES "student_records" ("student_id")
+    ON DELETE CASCADE,
+
+  FOREIGN KEY ("professor_id")
+    REFERENCES "professors" ("id")
+    ON DELETE CASCADE,
+
+  FOREIGN KEY ("subject_id")
+    REFERENCES "subjects" ("id")
+    ON DELETE CASCADE,
+
+  PRIMARY KEY ("id")
+);
+
+INSERT INTO student_records
+    ("student_id",   "student_email",              "student_name")
+VALUES
+    ( 1,             'john.b20@hogwarts.edu',      'John B'),
+    ( 2,             'sarah.s20@hogwarts.edu',     'Sarah S'),
+    ( 3,             'martha.l20@hogwarts.edu',    'Martha L'),
+    ( 4,             'james.g20@hogwarts.edu',     'James G'),
+    ( 5,             'stanley.p20@hogwarts.edu',   'Stanley P');
+
+INSERT INTO professors
+    ("id",     "professor_name")
+VALUES
+    ( 1,       'Natalie M'),
+    ( 2,       'William C'),
+    ( 3,       'Mark W');
+
+INSERT INTO subjects
+    ("id",     "subject_name")
+VALUES
+    ( 1,       'Philosophy'),
+    ( 2,       'Economics'),
+    ( 3,       'Mathematics');
+
+INSERT INTO grades
+    ("id", "student_id",  "professor_id",  "subject_id",     "grade")
+VALUES
+    ( 1,    1,            2,                1,                'A'),
+    ( 2,    2,            2,                1,                'C'),
+    ( 3,    3,            1,                2,                'A'),
+    ( 4,    4,            3,                3,                'B'),
+    ( 5,    5,            1,                2,                'B');
+
+
+4. In your own words, explain the potential disadvantages of normalizing the data above. What are its trade-offs? Submit your findings in the submission table and discuss them with your mentor in your next session.
+
+One disadvantage of a normalized database is slower reporting performance. Normalization will reduce redundancy and improve data integrity for inserting and updating students, professors and grades in the database. But this schema could slow down reporting when needing to create report cards or student rosters.
+
+For example to retrieve all of the data provided from the table in its original non-normalized format I used this select statement:
+
+SELECT *
+FROM student_records;
+
+Which is extremely straight forward and only took 1ms to retrieve.
+
+Where as, in the normalized schema to get the same output the following select statement is required:
+
+SELECT grades.id, grades.student_id, student_records.student_name, student_records.student_email, professors.id, professors.professor_name, grades.grade
+FROM grades
+JOIN student_records ON grades.student_id = student_records.student_id
+JOIN professors ON professors.id = grades.professor_id
+JOIN subjects ON grades.subject_id = subjects.id;
+
+Which is more complicated and it took 6ms to retrieved the same data. Six milliseconds may not seem like a long time, but if you need to retrieve data frequently and are working with a database of thousands or even tens of thousands of students a 600% increase in search time can be significant. This is one of the trade-offs to normalizing the database.
+
+5. Looking at the tables you have normalized. If you need to denormalize to improve query performance or speed up reporting, how would you carry out denormalization for this database design? Submit potential strategies in the submission tab and discuss them with your mentor in your next session.
+
+If you are denormalizing to improve readability I would want to know what information would be commonly queried by the users of the database. This would inform how I set up the database schema. However, it seems reasonable to have three different groups of information: one for student info, one for information on professors and a joining table that records student grades in a course. Something like this:
+
+CREATE TABLE student_records (
+  "student_id"     INTEGER,
+  "student_email"  VARCHAR(24),
+  "student_name"   VARCHAR(9),
+
+  PRIMARY KEY ("student_id")
+);
+
+CREATE TABLE professors (
+  "id"       INTEGER,
+  "professor_name" VARCHAR(32),
+
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE grades (
+  "id"             INTEGER,
+  "student_id"     INTEGER,
+  "professor_id"   INTEGER,
+  "subject"        VARCHAR(32),
+  "grade"          VARCHAR(1),
+
+  FOREIGN KEY ("student_id")
+    REFERENCES "student_records" ("student_id")
+    ON DELETE CASCADE,
+
+  FOREIGN KEY ("professor_id")
+    REFERENCES "professors" ("id")
+    ON DELETE CASCADE,
+
+  PRIMARY KEY ("id")
+);
+
+6. Explore the trade-offs between data normalization and denormalization in this scenario, submit your findings in the submission tab, and discuss them with your mentor in your next session.
+
+How is this question different than #4?
